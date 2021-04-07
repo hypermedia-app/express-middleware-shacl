@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import express, { Express } from 'express'
 import request from 'supertest'
-import { rdf, schema } from '@tpluscode/rdf-ns-builders'
+import { rdf, rdfs, schema, sh } from '@tpluscode/rdf-ns-builders'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { turtle } from '@tpluscode/rdf-string'
@@ -144,7 +144,7 @@ describe('express-middleware-shacl', () => {
       })
   })
 
-  it('calls next middleware when validation succeeds', async () => {
+  it('calls next middleware when validation succeeds by class target', async () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
@@ -166,6 +166,93 @@ describe('express-middleware-shacl', () => {
     const response = request(app)
       .post('/foo/bar/baz')
       .send(turtle`<http://example.com/foo/bar/baz> a ${schema.Person} ; ${schema.name} "John Doe" .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(200)
+  })
+
+  it('calls next middleware when validation succeeds by implicit class target', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        const graph = clownface({ dataset: $rdf.dataset() })
+        nodeShape(graph.namedNode(schema.Person), {
+          types: [rdfs.Class, sh.NodeShape],
+          property: propertyShape(graph.blankNode(), {
+            path: schema.name,
+            minCount: 1,
+          }),
+        })
+
+        return graph.dataset
+      },
+    }))
+    app.use((req, res) => res.end())
+
+    // when
+    const response = request(app)
+      .post('/foo/bar/baz')
+      .send(turtle`<http://example.com/foo/bar/baz> a ${schema.Person} ; ${schema.name} "John Doe" .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(200)
+  })
+
+  it('calls next middleware when validation succeeds by node target', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        const graph = clownface({ dataset: $rdf.dataset() })
+        nodeShape(graph.blankNode(), {
+          targetNode: [$rdf.namedNode('http://example.com/foo/bar/baz')],
+          property: propertyShape(graph.blankNode(), {
+            path: schema.name,
+            minCount: 1,
+          }),
+        })
+
+        return graph.dataset
+      },
+    }))
+    app.use((req, res) => res.end())
+
+    // when
+    const response = request(app)
+      .post('/foo/bar/baz')
+      .send(turtle`<http://example.com/foo/bar/baz> ${schema.name} "John Doe" .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(200)
+  })
+
+  it('calls next middleware when validation succeeds by "subject of" target', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        const graph = clownface({ dataset: $rdf.dataset() })
+        nodeShape(graph.blankNode(), {
+          targetSubjectsOf: schema.name,
+          property: propertyShape(graph.blankNode(), {
+            path: schema.name,
+            minCount: 1,
+          }),
+        })
+
+        return graph.dataset
+      },
+    }))
+    app.use((req, res) => res.end())
+
+    // when
+    const response = request(app)
+      .post('/foo/bar/baz')
+      .send(turtle`<http://example.com/foo/bar/baz> ${schema.name} "John Doe" .`.toString())
       .set('host', 'example.com')
       .set('content-type', 'text/turtle')
 

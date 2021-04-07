@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "@tpluscode/rdf-ns-builders": "^0.4.2",
+    "@rdfjs/term-set": "^1.0.1",
     "@rdfine/shacl": "^0.8.0",
     "absolute-url": "^1.2.2",
     "clownface": "^1.2.0",
@@ -47,6 +48,7 @@
     "@types/rdf-js": "^4.0.1",
     "@types/rdf-validate-shacl": "^0.2",
     "@types/rdfjs__express-handler": "^1",
+    "@types/rdfjs__term-set": "^1",
     "@types/set-link": "^1.0.1",
     "@types/sinon": "^9.0.11",
     "@types/sinon-chai": "^3.2.5",

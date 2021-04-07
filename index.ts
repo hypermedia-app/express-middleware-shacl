@@ -6,11 +6,12 @@ import DatasetExt from 'rdf-ext/lib/Dataset'
 import SHACLValidator from 'rdf-validate-shacl'
 import clownface, { AnyContext, AnyPointer } from 'clownface'
 import { ProblemDocument } from 'http-problem-details'
-import { hydra, rdf, sh } from '@tpluscode/rdf-ns-builders'
+import { hydra, rdf, rdfs, sh } from '@tpluscode/rdf-ns-builders'
 import { attach } from 'express-rdf-request'
 import * as absoluteUrl from 'absolute-url'
 import { fromPointer } from '@rdfine/shacl/lib/ValidationResult'
 import setLink from 'set-link'
+import TermSet from '@rdfjs/term-set'
 
 // Trick typescript to not compile import() into require()
 // eslint-disable-next-line no-new-func
@@ -35,11 +36,23 @@ function isNamedNode(term: Term): term is NamedNode {
 }
 
 function targetsFound({ shacl: { shapesGraph, dataGraph } }: express.Request): boolean {
-  const classTargets = () => shapesGraph.has(sh.targetClass, dataGraph.has(rdf.type).out(rdf.type)).terms
-  const nodeTargets = () => shapesGraph.has(sh.targetNode, dataGraph.has([])).terms
+  const resourceTypes = new TermSet(dataGraph.any().has(rdf.type).out(rdf.type).terms)
+
+  const classTargets = () => shapesGraph.has(sh.targetClass, dataGraph.any().has(rdf.type).out(rdf.type)).terms
+  const implicitClassTargets = () => {
+    const shapes = shapesGraph.has(rdf.type, [rdfs.Class, sh.NodeShape])
+    return shapes.terms.filter(shape => resourceTypes.has(shape))
+  }
+  const nodeTargets = () => shapesGraph.has(sh.targetNode, dataGraph.any().in()).terms
+  const subjectOfTargets = () =>
+    shapesGraph.has(sh.targetSubjectsOf).out(sh.targetSubjectsOf)
+      .toArray()
+      .flatMap(predicate => [...dataGraph.dataset.match(null, predicate.term)])
 
   return classTargets().length > 0 ||
-  nodeTargets().length > 0
+    implicitClassTargets().length > 0 ||
+    nodeTargets().length > 0 ||
+    subjectOfTargets().length > 0
 }
 
 export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOptions): Router => {

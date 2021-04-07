@@ -1590,6 +1590,13 @@
   dependencies:
     "@types/rdf-js" "*"
 
+"@types/rdfjs__term-set@^1":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/rdfjs__term-set/-/rdfjs__term-set-1.0.2.tgz#977ff77d71a76bbb1e56fb1ca974bea7cc370f92"
+  integrity sha512-xRSPtnuBdSBC8cMxGDBUEG8LTAVG9gjuK7q/JjDOTSWMTFUcfjDMntMgqqF/82MBTfDiCwJ0bFTS3iQrZb3ANw==
+  dependencies:
+    "@types/rdf-js" "*"
+
 "@types/semver@^6.0.0":
   version "6.2.2"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.2.2.tgz#5c27df09ca39e3c9beb4fae6b95f4d71426df0a9"

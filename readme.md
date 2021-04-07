@@ -158,6 +158,11 @@ WHERE {
 If the `req.shacl.shapesGraph` dataset is empty, the next middleware will be called.
 
 If there are shapes in `req.shacl.shapesGraph` but none of them have a target matching the requested
-resources, `Bad Request` will be the response.
+resources, `Bad Request` will be the response. Considered are:
+
+- [implicit class targets](https://www.w3.org/TR/shacl/#implicit-targetClass)
+- `sh:targetClass`,
+- `sh:targetNode`
+- `sh:targetSubjectsOf`.
 
 If the validation succeeds (`sh:conforms true`), the next middleware will be called.
