@@ -9,29 +9,31 @@ document extended to be valid JSON-LD resource.
 
 ## Setup
 
-The package export a factory to create an express middleware handler. One parameter is required:
+The package exports a factory to create an express middleware handler. One parameter is required:
 
 ```typescript
 import express from 'express'
 import { shaclMiddleware } from 'express-middleware-shacl'
 import { rdf } from '@tpluscode/rdf-ns-builders'
-import { NamedNode, Quad } from 'rdf-js' 
-import { GraphPointer } from 'clownface'
-import { loadResource } from './store'
+import { NamedNode, DatasetCore } from 'rdf-js' 
+import { loadResources } from './store'
 
 const app = express()
 
 app.use(shaclMiddleware({
   // Load the shapes to populate the Shapes Graph.
-  async loadShapes(req): Promise<GraphPointer[]> {
+  async loadShapes(req): Promise<DatasetCore> {
       // Should at least use the payload resource types but might also select more shapes,
       // such as any shape annotated on the existing resource in database
       const types = req.shacl.dataGraph.out(rdf.type).terms
       
-      return Promise.all(types.map(loadResource))
+      // Possible implementation could be a DESCRIBE query
+      /*
+       DESCRIBE ?shape1 ?shape2 ... ?shapeN
+       */
   },
   // (Optional) Load rdf:type quads of the given resources
-  loadTypes(resources: NamedNode[]): Promise<Quad[]> {
+  loadTypes(resources: NamedNode[]): Promise<DatasetCore> {
       // For example, could be implemented as a SPARQL query
       /*
        CONSTRUCT { ?resource a ?type }
@@ -55,20 +57,18 @@ The middleware works in four stages. Check the sections below for more explanati
 Downstream handler will have access to `req.shacl`, which is defined as 
 
 ```typescript
-import type { NamedNode } from 'rdf-js'
-import type { GraphPointer } from 'clownface'
-import type DatasetExt from 'rdf-ext/lib/Dataset' 
+import type { AnyPointer } from 'clownface'
 
 interface Shacl {
     /**
-     * The requested RDF resource, parsed from body
+     * The requested RDF resources, parsed from body
      */
-    dataGraph: GraphPointer
+    dataGraph: AnyPointer
     
     /**
-     * RDF/JS dataset for the loaded Shapes
+     * The loaded Shapes
      */
-    shapesGraph: DatasetExt
+    shapesGraph: AnyPointer
 }
 ```
 
@@ -85,9 +85,8 @@ app.use((req, res, next) => {
   req.resource = async function() {
     // an async function which should return a Graph Pointer
     let dataset
-    let term
     
-    return clownface({ dataset, term })
+    return clownface({ dataset })
   }
   
   next()
@@ -113,7 +112,7 @@ base <http://example.com/>
 ```
 
 The type `<vocab/Person>` may be a shape which requires the object of `schema:spouse` and
-`schema:knows` to also be an instance of the same type:
+`schema:knows` to also be an instances of the same type:
 
 ```turtle
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -136,7 +135,7 @@ base <http://example.com/>
 As-is, validation of the resource `<Leonard>` will fail because a SHACL validation library will not
 be able to verify that the linked resources also have the correct RDF type.
 
-Given such shapes, it will be necessary to provide an implementation of the `loadTypes` option. As
+Given such shapes, it will be necessary to provide an implementation of the `loadTypes` function. As
 mentioned above, it could be implemented as SPARQL Construct. In a simplest case, when the store's
 default graph would be queried fo all data, that query could be as simple as:
 
@@ -146,6 +145,7 @@ base <http://example.com/>
 CONSTRUCT { ?instance a ?type }
 WHERE {
   VALUES ?instance {
+    # iterate the array passed to loadTypes
     <Penny> <Howard> <Sheldon>
   }
 
@@ -156,5 +156,8 @@ WHERE {
 ### Validation run
 
 If the `req.shacl.shapesGraph` dataset is empty, the next middleware will be called.
+
+If there are shapes in `req.shacl.shapesGraph` but none of them have a target matching the requested
+resources, `Bad Request` will be the response.
 
 If the validation succeeds (`sh:conforms true`), the next middleware will be called.
