@@ -54,7 +54,7 @@ The middleware works in four stages. Check the sections below for more explanati
 
 ### `req.shacl`
 
-Downstream handler will have access to `req.shacl`, which is defined as 
+Downstream handlers will have access to `req.shacl`, which is defined as 
 
 ```typescript
 import type { AnyPointer } from 'clownface'
