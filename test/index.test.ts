@@ -202,6 +202,35 @@ describe('express-middleware-shacl', () => {
     await response.expect(200)
   })
 
+  it('returns Problem Document if loaded shape has no target and is not rdfs:Class', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        const graph = clownface({ dataset: $rdf.dataset() })
+        nodeShape(graph.namedNode(schema.Person), {
+          types: [sh.NodeShape],
+          property: propertyShape(graph.blankNode(), {
+            path: schema.name,
+            minCount: 1,
+          }),
+        })
+
+        return graph.dataset
+      },
+    }))
+    app.use((req, res) => res.end())
+
+    // when
+    const response = request(app)
+      .post('/foo/bar/baz')
+      .send(turtle`<http://example.com/foo/bar/baz> a ${schema.Person} ; ${schema.name} "John Doe" .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(400)
+  })
+
   it('calls next middleware when validation succeeds by node target', async () => {
     // given
     app.use(shaclMiddleware({

@@ -44,7 +44,7 @@ function targetsFound({ shacl: { shapesGraph, dataGraph } }: express.Request): b
 
   const classTargets = () => shapesGraph.has(sh.targetClass, dataGraph.any().has(rdf.type).out(rdf.type)).terms
   const implicitClassTargets = () => {
-    const shapes = shapesGraph.has(rdf.type, [rdfs.Class, sh.NodeShape])
+    const shapes = shapesGraph.has(rdf.type, sh.NodeShape).has(rdf.type, rdfs.Class)
     return shapes.terms.filter(shape => resourceTypes.has(shape))
   }
   const nodeTargets = () => shapesGraph.has(sh.targetNode, dataGraph.any().in()).terms
