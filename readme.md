@@ -159,7 +159,7 @@ If the `req.shacl.shapesGraph` dataset is empty, the next middleware will be cal
 
 If there are shapes in `req.shacl.shapesGraph` but none of them have a target matching the requested
 resources, `Bad Request` will be the response. This is to prevent false-positives, in case when the 
-paload would be completely unerelated to the shapes, thus resuling in no validation actually happening.
+payload would be completely unrelated to the shapes, thus resuling in no validation actually happening.
 Considered are:
 
 - [implicit class targets](https://www.w3.org/TR/shacl/#implicit-targetClass)
