@@ -12,6 +12,10 @@ import * as absoluteUrl from 'absolute-url'
 import { fromPointer } from '@rdfine/shacl/lib/ValidationResult'
 import setLink from 'set-link'
 import TermSet from '@rdfjs/term-set'
+import RdfResource from '@tpluscode/rdfine/RdfResource'
+import { ShapeBundle } from '@rdfine/shacl/bundles'
+
+RdfResource.factory.addMixin(...ShapeBundle)
 
 // Trick typescript to not compile import() into require()
 // eslint-disable-next-line no-new-func

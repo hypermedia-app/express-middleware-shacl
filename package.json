@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "@tpluscode/rdf-ns-builders": "^0.4.2",
+    "@tpluscode/rdfine": "^0.5.25",
     "@rdfjs/term-set": "^1.0.1",
     "@rdfine/shacl": "^0.8.0",
     "absolute-url": "^1.2.2",
