@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.0
+
+### Minor Changes
+
+- fe3f56e: Correctly validate against hierarchies of shapes
+
 ## 1.0.1
 
 ### Patch Changes
