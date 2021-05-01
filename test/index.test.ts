@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import express, { Express } from 'express'
 import request from 'supertest'
-import { rdf, rdfs, schema, sh } from '@tpluscode/rdf-ns-builders'
+import { foaf, rdf, rdfs, schema, sh } from '@tpluscode/rdf-ns-builders'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { turtle } from '@tpluscode/rdf-string'
@@ -319,5 +319,40 @@ describe('express-middleware-shacl', () => {
 
     // then
     await response.expect(200)
+  })
+
+  it('validates resource using hierarchy of shapes', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        return clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
+          .addOut(rdfs.subClassOf, foaf.Agent)
+          .addOut(rdf.type, [rdfs.Class, sh.NodeShape])
+          .node(foaf.Agent)
+          .addOut(rdf.type, [rdfs.Class, sh.NodeShape])
+          .addOut(sh.property, property => {
+            property
+              .addOut(sh.path, foaf.name)
+              .addOut(sh.minCount, 1)
+          }).dataset
+      },
+      async loadTypes(resources) {
+        return $rdf.dataset(resources.map(resource => $rdf.quad(resource, rdf.type, foaf.Person)))
+      },
+    }))
+    app.use((req, res) => res.end())
+
+    // when
+    const response = request(app)
+      .post('/Leonard')
+      .send(turtle`<> a ${foaf.Person} .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(400)
+      .expect(res => {
+        expect(res.text).to.contain('MinCount')
+      })
   })
 })
