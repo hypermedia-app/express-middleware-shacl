@@ -1,4 +1,4 @@
-import { DatasetCore, NamedNode, Term } from 'rdf-js'
+import { DatasetCore, NamedNode, Quad, Term } from 'rdf-js'
 import express, { Request, Router } from 'express'
 import asyncMiddleware from 'middleware-async'
 import $rdf from 'rdf-ext'
@@ -57,6 +57,13 @@ function targetsFound({ shacl: { shapesGraph, dataGraph } }: express.Request): b
     implicitClassTargets().length > 0 ||
     nodeTargets().length > 0 ||
     subjectOfTargets().length > 0
+}
+
+function toGraph(uri: string) {
+  const graph = $rdf.namedNode(uri)
+  return ({ subject, predicate, object }: Quad) => {
+    return $rdf.quad(subject, predicate, object, graph)
+  }
 }
 
 export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOptions): Router => {
@@ -127,7 +134,12 @@ export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOption
       }))
     }
 
-    const validationReport = new SHACLValidator(req.shacl.shapesGraph.dataset).validate(req.shacl.dataGraph.dataset)
+    const dataset = $rdf.dataset(
+      [...req.shacl.shapesGraph.dataset.map(toGraph('urn:graph:shapes')),
+        ...[...req.shacl.dataGraph.dataset].map(toGraph('urn:graph:data'))],
+    )
+
+    const validationReport = new SHACLValidator(dataset).validate(dataset)
     if (validationReport.conforms) {
       return next()
     }
