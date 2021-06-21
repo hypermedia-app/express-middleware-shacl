@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.1
+
+### Patch Changes
+
+- 2df50f3: Update RDF/JS types and @tpluscode/rdf-ns-builders
+
 ## 1.1.0
 
 ### Minor Changes
