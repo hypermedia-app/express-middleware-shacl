@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.2
+
+### Patch Changes
+
+- 9e2cd7a: Update clownface-shacl-path
+
 ## 1.1.1
 
 ### Patch Changes
