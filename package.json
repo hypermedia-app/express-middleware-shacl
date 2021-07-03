@@ -23,7 +23,7 @@
     "@rdfine/shacl": "^0.8.1",
     "absolute-url": "^1.2.2",
     "clownface": "^1.2.0",
-    "clownface-shacl-path": "^1.0.2",
+    "clownface-shacl-path": "^1.2.2",
     "express": "^4.17.1",
     "express-rdf-request": "^1.1.0",
     "http-problem-details": "^0.1.5",

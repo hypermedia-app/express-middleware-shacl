@@ -4,7 +4,7 @@ import asyncMiddleware from 'middleware-async'
 import $rdf from 'rdf-ext'
 import DatasetExt from 'rdf-ext/lib/Dataset'
 import SHACLValidator from 'rdf-validate-shacl'
-import clownface, { AnyContext, AnyPointer } from 'clownface'
+import clownface, { AnyContext, AnyPointer, GraphPointer } from 'clownface'
 import { ProblemDocument } from 'http-problem-details'
 import { hydra, rdf, rdfs, sh } from '@tpluscode/rdf-ns-builders'
 import { attach } from 'express-rdf-request'
@@ -14,12 +14,9 @@ import setLink from 'set-link'
 import TermSet from '@rdfjs/term-set'
 import RdfResource from '@tpluscode/rdfine/RdfResource'
 import { ShapeBundle } from '@rdfine/shacl/bundles'
+import { findNodes } from 'clownface-shacl-path'
 
 RdfResource.factory.addMixin(...ShapeBundle)
-
-// Trick typescript to not compile import() into require()
-// eslint-disable-next-line no-new-func
-const _esImport = new Function('modulePath', 'return import(modulePath)')
 
 interface ShaclMiddlewareOptions {
   loadTypes?(resources: NamedNode[]): Promise<DatasetCore>
@@ -29,7 +26,7 @@ interface ShaclMiddlewareOptions {
 declare module 'express-serve-static-core' {
   interface Request {
     shacl: {
-      dataGraph: AnyPointer
+      dataGraph: GraphPointer
       shapesGraph: AnyPointer<AnyContext, DatasetExt>
     }
   }
@@ -73,9 +70,9 @@ export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOption
     await attach(req, res)
     absoluteUrl.attach(req)
 
-    let dataGraph: AnyPointer
+    let dataGraph: GraphPointer
     if (!req.dataset) {
-      dataGraph = clownface({ dataset: $rdf.dataset() })
+      dataGraph = clownface({ dataset: $rdf.dataset() }).blankNode()
     } else {
       dataGraph = await req.resource()
     }
@@ -97,8 +94,6 @@ export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOption
 
   // Load data from linked instances to be able to validate their type
   router.use(asyncMiddleware(async function loadResourceTypes(req, res, next) {
-    const { findNodes } = await _esImport('clownface-shacl-path')
-
     const linkedInstances = req.shacl.shapesGraph
       .has(sh.property)
       .out(sh.property)

@@ -2275,13 +2275,14 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
 
-clownface-shacl-path@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/clownface-shacl-path/-/clownface-shacl-path-1.0.2.tgz#912ad84e7f2b6a8f14d29e86970bfa2688c87dff"
-  integrity sha512-pqrEoovPyf4YGoH/4bg21ldGhqEDmskhgI36rk+vOrdSGHXWCLUY0h4X+j6RHmvfuxh0jH5uXA+MlkLztEn9rw==
+clownface-shacl-path@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/clownface-shacl-path/-/clownface-shacl-path-1.2.2.tgz#0a3b8d29b52402e5ed42521fbd8cbae4329e4ea4"
+  integrity sha512-vXrmPf5sM1M84k2r1O1ud14Zx/5yLBCWWqpam0y34r77tejEK5FwYjq5qXqrwSqosLEr53KbptbqHZvHKeFYjA==
   dependencies:
     "@rdf-esm/term-set" "^0.5.0"
     "@tpluscode/rdf-ns-builders" "^1.0.0"
+    "@tpluscode/rdf-string" "^0.2.24"
 
 clownface@^1, clownface@^1.0.0, clownface@^1.2.0:
   version "1.2.0"
