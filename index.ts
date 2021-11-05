@@ -21,6 +21,7 @@ RdfResource.factory.addMixin(...ShapeBundle)
 interface ShaclMiddlewareOptions {
   loadTypes?(resources: NamedNode[]): Promise<DatasetCore>
   loadShapes(req: Request): Promise<DatasetCore>
+  errorContext?: string
 }
 
 declare module 'express-serve-static-core' {
@@ -63,7 +64,7 @@ function toGraph(uri: string) {
   }
 }
 
-export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOptions): Router => {
+export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https://www.w3.org/ns/hydra/error' }: ShaclMiddlewareOptions): Router => {
   const router = Router()
 
   router.use(asyncMiddleware(async function initShaclGraphs(req, res, next) {
@@ -121,11 +122,14 @@ export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOption
     }
 
     if (!targetsFound(req)) {
+      res.setLink(errorContext, 'http://www.w3.org/ns/json-ld#context')
       return res.status(400).send(new ProblemDocument({
         status: 400,
         title: 'Request validation error',
         detail: 'No target resources found for loaded shapes',
         type: 'http://tempuri.org/BadRequest',
+      }, {
+        '@type': hydra.Error.value,
       }))
     }
 
@@ -153,7 +157,7 @@ export const shaclMiddleware = ({ loadShapes, loadTypes }: ShaclMiddlewareOption
       [sh.result.value]: results,
     })
 
-    res.setLink('http://www.w3.org/ns/hydra/error', 'http://www.w3.org/ns/json-ld#context')
+    res.setLink(errorContext, 'http://www.w3.org/ns/json-ld#context')
     res.status(400).send(response)
   }))
 

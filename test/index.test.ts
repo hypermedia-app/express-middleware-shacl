@@ -139,6 +139,7 @@ describe('express-middleware-shacl', () => {
 
     // then
     await response.expect(400)
+      .expect('link', /https:\/\/www\.w3\.org\/ns\/hydra\/error/)
       .expect(res => {
         expect(res.body.detail).to.eq('The request payload does not conform to the SHACL description of this endpoint.')
       })
@@ -228,7 +229,7 @@ describe('express-middleware-shacl', () => {
       .set('content-type', 'text/turtle')
 
     // then
-    await response.expect(400)
+    await response.expect(400).expect('link', /https:\/\/www\.w3\.org\/ns\/hydra\/error/)
   })
 
   it('calls next middleware when validation succeeds by node target', async () => {
