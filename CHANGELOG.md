@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.3
+
+### Patch Changes
+
+- 5994f6e: Hydra error context is set to HTTPS by default, with override possible
+
 ## 1.1.2
 
 ### Patch Changes
