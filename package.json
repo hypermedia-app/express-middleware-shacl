@@ -76,14 +76,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tpluscode/express-middleware-shacl.git"
+    "url": "git+https://github.com/hypermedia-app/express-middleware-shacl.git"
   },
   "author": "Tomasz Pluskiewicz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tpluscode/express-middleware-shacl/issues"
+    "url": "https://github.com/hypermedia-app/express-middleware-shacl/issues"
   },
-  "homepage": "https://github.com/tpluscode/express-middleware-shacl#readme",
+  "homepage": "https://github.com/hypermedia-app/express-middleware-shacl#readme",
   "mocha": {
     "watch-files": [
       "./**/*.ts"
