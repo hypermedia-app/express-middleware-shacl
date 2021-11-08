@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.4
+
+### Patch Changes
+
+- 9997829: Wrong links in package.json
+
 ## 1.1.3
 
 ### Patch Changes
