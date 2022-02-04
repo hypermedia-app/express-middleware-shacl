@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.1.5
+
+### Patch Changes
+
+- d977c81: fix: [DEP0128] DeprecationWarning: Invalid 'main' field
+
 ## 1.1.4
 
 ### Patch Changes
