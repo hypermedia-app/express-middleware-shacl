@@ -22,7 +22,7 @@ const app = express()
 
 app.use(shaclMiddleware({
   // Load the shapes to populate the Shapes Graph.
-  async loadShapes(req): Promise<DatasetCore> {
+  async loadShapes(req: express.Request): Promise<DatasetCore> {
       // Should at least use the payload resource types but might also select more shapes,
       // such as any shape annotated on the existing resource in database
       const types = req.shacl.dataGraph.out(rdf.type).terms
@@ -33,7 +33,7 @@ app.use(shaclMiddleware({
        */
   },
   // (Optional) Load rdf:type quads of the given resources
-  loadTypes(resources: NamedNode[]): Promise<DatasetCore> {
+  loadTypes(resources: NamedNode[], req: express.Request): Promise<DatasetCore> {
       // For example, could be implemented as a SPARQL query
       /*
        CONSTRUCT { ?resource a ?type }
