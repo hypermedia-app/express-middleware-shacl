@@ -19,7 +19,7 @@ import { findNodes } from 'clownface-shacl-path'
 RdfResource.factory.addMixin(...ShapeBundle)
 
 interface ShaclMiddlewareOptions {
-  loadTypes?(resources: NamedNode[]): Promise<DatasetCore>
+  loadTypes?(resources: NamedNode[], req: Request): Promise<DatasetCore>
   loadShapes(req: Request): Promise<DatasetCore>
   errorContext?: string
 }
@@ -105,7 +105,7 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
       .filter(isNamedNode)
 
     if (loadTypes && linkedInstances.length) {
-      const typeQuads = await loadTypes(linkedInstances)
+      const typeQuads = await loadTypes(linkedInstances, req)
       for (const quad of typeQuads) {
         req.shacl.dataGraph.dataset.add(quad)
       }
