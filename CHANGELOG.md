@@ -1,5 +1,16 @@
 # express-middleware-shacl
 
+## 1.2.0
+
+### Minor Changes
+
+- aae8333: Pass `Request` object to `loadTypes`
+
+### Patch Changes
+
+- 51ddd31: Update express-rdf-request to 1.1.2
+- dc06cb1: Update express to 4.17.3
+
 ## 1.1.5
 
 ### Patch Changes
