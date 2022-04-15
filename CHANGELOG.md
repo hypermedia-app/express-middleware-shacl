@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.3.0
+
+### Minor Changes
+
+- 8a2645b: Forward `res` to middleware's callbacks
+
 ## 1.2.0
 
 ### Minor Changes
