@@ -1,5 +1,5 @@
 import { DatasetCore, NamedNode, Quad, Term } from 'rdf-js'
-import express, { Request, Router } from 'express'
+import express, { Request, Response, Router } from 'express'
 import asyncMiddleware from 'middleware-async'
 import $rdf from 'rdf-ext'
 import DatasetExt from 'rdf-ext/lib/Dataset'
@@ -19,8 +19,8 @@ import { findNodes } from 'clownface-shacl-path'
 RdfResource.factory.addMixin(...ShapeBundle)
 
 interface ShaclMiddlewareOptions {
-  loadTypes?(resources: NamedNode[], req: Request): Promise<DatasetCore>
-  loadShapes(req: Request): Promise<DatasetCore>
+  loadTypes?(resources: NamedNode[], req: Request, res: Response): Promise<DatasetCore>
+  loadShapes(req: Request, res: Response): Promise<DatasetCore>
   errorContext?: string
 }
 
@@ -86,7 +86,7 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
   }))
 
   router.use(asyncMiddleware(async (req, res, next) => {
-    const shapes = await loadShapes(req)
+    const shapes = await loadShapes(req, res)
 
     req.shacl.shapesGraph.dataset.addAll([...shapes])
 
@@ -105,7 +105,7 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
       .filter(isNamedNode)
 
     if (loadTypes && linkedInstances.length) {
-      const typeQuads = await loadTypes(linkedInstances, req)
+      const typeQuads = await loadTypes(linkedInstances, req, res)
       for (const quad of typeQuads) {
         req.shacl.dataGraph.dataset.add(quad)
       }
