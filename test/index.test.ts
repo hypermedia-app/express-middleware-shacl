@@ -356,4 +356,39 @@ describe('express-middleware-shacl', () => {
         expect(res.text).to.contain('MinCount')
       })
   })
+
+  it('does not modify the contents of original req.request', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        return clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
+          .addOut(rdf.type, [rdfs.Class, sh.NodeShape])
+          .addOut(sh.property, property => {
+            property
+              .addOut(sh.path, schema.spouse)
+              .addOut(sh.class, foaf.Person)
+          }).dataset
+      },
+      async loadTypes(resources) {
+        return $rdf.dataset(resources.map(resource => $rdf.quad(resource, rdf.type, foaf.Person)))
+      },
+    }))
+    app.use(async (req, res) => {
+      const resource = await req.resource()
+      res.send({ size: resource.dataset.size })
+    })
+
+    // when
+    const response = request(app)
+      .post('/Leonard')
+      .send(turtle`<> a ${foaf.Person}; ${schema.spouse} <Penny> .`.toString())
+      .set('host', 'example.com')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(200)
+      .expect({
+        size: 2,
+      })
+  })
 })
