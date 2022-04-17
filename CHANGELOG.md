@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.3.1
+
+### Patch Changes
+
+- 2a6e1e5: When a property with `sh:class` was processed, the middleware would inadvertently modify the resource graph. Those changes would stay for the remainder of the request
+
 ## 1.3.0
 
 ### Minor Changes
