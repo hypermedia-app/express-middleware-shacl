@@ -71,15 +71,19 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
     await attach(req, res)
     absoluteUrl.attach(req)
 
-    let dataGraph: GraphPointer
+    let dataGraphDataset: DatasetCore
+    let term: Term
     if (!req.dataset) {
-      dataGraph = clownface({ dataset: $rdf.dataset() }).blankNode()
+      dataGraphDataset = $rdf.dataset()
+      term = $rdf.blankNode()
     } else {
-      dataGraph = await req.resource()
+      const reqResource = await req.resource()
+      dataGraphDataset = $rdf.dataset([...reqResource.dataset])
+      term = reqResource.term
     }
 
     req.shacl = {
-      dataGraph,
+      dataGraph: clownface({ dataset: dataGraphDataset, term }),
       shapesGraph: clownface({ dataset: $rdf.dataset() }),
     }
     next()
