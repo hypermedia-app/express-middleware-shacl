@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 1.3.2
+
+### Patch Changes
+
+- 95e6383: Update `rdfine` and `@tpluscode/rdf-ns-builders`
+
 ## 1.3.1
 
 ### Patch Changes
