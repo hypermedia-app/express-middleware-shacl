@@ -1,0 +1,168 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix hydra: <http://www.w3.org/ns/hydra/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc11: <http://purl.org/dc/elements/1.1/> .
+@prefix schema: <http://schema.org/> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix err: <http://www.w3.org/2005/xqt-errors#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+@prefix fti: <http://franz.com/ns/allegrograph/2.2/textindex/> .
+@prefix keyword: <http://franz.com/ns/keyword#> .
+@prefix nd: <http://franz.com/ns/allegrograph/5.0/geo/nd#> .
+@prefix ndfn: <http://franz.com/ns/allegrograph/5.0/geo/nd/fn#> .
+
+<https://wikibus.lndo.site/api/Brand> a rdf:Class, sh:NodeShape, hydra:Class, rdfs:Resource, sh:Shape, rdfs:Class, hydra:Resource, rdfs:Resource, sh:Shape, rdfs:Class, hydra:Resource ;
+  rdfs:subClassOf rdfs:Resource, skos:Concept, schema:Brand, <https://schema.wikibus.org/Brand>, rdfs:Resource, hydra:Resource, skos:Concept, <https://wikibus.lndo.site/api/VehicleConcept>, schema:Brand, rdfs:Resource, skos:Concept, schema:Brand, rdfs:Resource, skos:Concept, schema:Brand ;
+  hydra:supportedOperation [
+                             rdf:type schema:ReplaceAction, hydra:Operation, rdfs:Resource, hydra:Operation, rdfs:Resource ;
+                             rdfs:label "Save" ;
+                             hydra:title "Save" ;
+                             hydra:method "PUT" ;
+                             hydra:expects <https://wikibus.lndo.site/api/Brand> ;
+                             <https://code.described.at/implementedBy> [
+                                                                         rdf:type <https://code.described.at/EcmaScript>, rdfs:Resource, rdfs:Resource ;
+                                                                         <https://code.described.at/link> <node:@hydrofoil/knossos/resource#PUT> ;
+                                                                       ] ;
+                             <https://hypermedia.app/knossos#supportedBy> <https://wikibus.lndo.site/api/Brand> ;
+                           ] ;
+  sh:property _:b932CDE4Ex86364, _:b932CDE4Ex86365, _:b932CDE4Ex86366, _:b932CDE4Ex86367, _:b932CDE4Ex86368, _:b932CDE4Ex86369, _:b932CDE4Ex86370 ;
+  hydra:apiDocumentation <https://wikibus.lndo.site/api> .
+
+_:b932CDE4Ex86370 sh:path rdfs:seeAlso ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:nodeKind sh:IRI ;
+  dash:editor dash:URIEditor ;
+  sh:group [
+             sh:order 2 ;
+             sh:property _:b932CDE4Ex86370 ;
+             rdfs:label "Links" ;
+             rdf:type rdfs:Resource, sh:Shape, sh:PropertyGroup, rdfs:Resource, sh:Shape, sh:PropertyGroup ;
+             <https://hypermedia.app/knossos#groupProperty> _:b932CDE4Ex86370 ;
+           ] .
+
+_:b932CDE4Ex86369 sh:name "Article content" ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path schema:text ;
+  sh:datatype <https://atomicdata.dev/datatypes/markdown> ;
+  sh:maxCount 1 ;
+  sh:group [
+             sh:order 1 ;
+             sh:property _:b932CDE4Ex86369 ;
+             rdfs:label "Article" ;
+             rdf:type rdfs:Resource, sh:Shape, sh:PropertyGroup, rdfs:Resource, sh:Shape, sh:PropertyGroup ;
+             <https://hypermedia.app/knossos#groupProperty> _:b932CDE4Ex86369 ;
+           ] .
+
+_:b932CDE4Ex86368 sh:name "Logo" ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path schema:image ;
+  sh:order 40 ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:BlankNode ;
+  dash:editor dash:DetailsEditor ;
+  sh:node [
+            sh:property [
+                          sh:name "Image address" ;
+                          rdf:type rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+                          sh:path schema:contentUrl ;
+                          sh:minCount 1 ;
+                          sh:order 1 ;
+                          sh:maxCount 1 ;
+                          sh:nodeKind sh:IRI ;
+                        ], [
+                             sh:name "Caption" ;
+                             rdf:type rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+                             sh:path schema:caption ;
+                             sh:datatype xsd:string ;
+                             sh:order 2 ;
+                             sh:maxCount 1 ;
+                           ], [
+                                sh:path rdf:type ;
+                                rdf:type rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+                                sh:hasValue schema:ImageObject ;
+                                sh:defaultValue schema:ImageObject ;
+                                sh:deactivated true ;
+                                dash:hidden true ;
+                              ] ;
+            rdf:type rdfs:Resource, sh:Shape, sh:NodeShape, rdfs:Resource, sh:Shape, sh:NodeShape ;
+            rdfs:label "Image object" ;
+          ] ;
+  sh:group _:b932CDE4Ex86385 .
+
+_:b932CDE4Ex86385 sh:order 0 ;
+  sh:property _:b932CDE4Ex86368, _:b932CDE4Ex86367, _:b932CDE4Ex86366, _:b932CDE4Ex86364 ;
+  rdfs:label "Base information" ;
+  <https://hypermedia.app/knossos#groupProperty> _:b932CDE4Ex86364, _:b932CDE4Ex86366, _:b932CDE4Ex86367, _:b932CDE4Ex86368 ;
+  a rdfs:Resource, sh:Shape, sh:PropertyGroup, rdfs:Resource, sh:Shape, sh:PropertyGroup .
+
+_:b932CDE4Ex86367 sh:name "Search variants" ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path skos:hiddenLabel ;
+  sh:order 30 ;
+  sh:description "Hidden labels, such as misspelled variants" ;
+  sh:group _:b932CDE4Ex86385 .
+
+_:b932CDE4Ex86364 sh:name "Name", "Nazwa"@pl ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path skos:prefLabel ;
+  sh:minCount 1 ;
+  sh:minLength 3 ;
+  sh:or (
+          [
+            sh:datatype rdf:langString ;
+            rdf:type rdfs:Resource, rdfs:Resource ;
+          ]
+          [
+            sh:datatype xsd:string ;
+            rdf:type rdfs:Resource, rdfs:Resource ;
+          ]
+        ) ;
+  sh:uniqueLang true ;
+  sh:group _:b932CDE4Ex86385 ;
+  sh:order 10 .
+
+_:b932CDE4Ex86366 sh:name "Alternative names" ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path skos:altLabel ;
+  sh:or (
+          [
+            sh:datatype rdf:langString ;
+            rdf:type rdfs:Resource, rdfs:Resource ;
+          ]
+          [
+            sh:datatype xsd:string ;
+            rdf:type rdfs:Resource, rdfs:Resource ;
+          ]
+        ) ;
+  sh:uniqueLang true ;
+  sh:order 20 ;
+  sh:description "Alternative spelling, abbreviations, etc" ;
+  sh:group _:b932CDE4Ex86385 .
+
+_:b932CDE4Ex86365 sh:name "Slug" ;
+  a rdfs:Resource, sh:Shape, sh:PropertyShape, rdfs:Resource, sh:Shape, sh:PropertyShape ;
+  sh:path skos:notation ;
+  sh:minCount 1 ;
+  sh:description "Lower case, URL-friendly string, which will be used in identifiers" ;
+  sh:maxCount 1 ;
+  sh:pattern "^[a-z-]+$" ;
+  sh:group [
+             sh:order 3 ;
+             sh:property _:b932CDE4Ex86365 ;
+             rdfs:label "Other" ;
+             rdf:type rdfs:Resource, sh:Shape, sh:PropertyGroup, rdfs:Resource, sh:Shape, sh:PropertyGroup ;
+             <https://hypermedia.app/knossos#groupProperty> _:b932CDE4Ex86365 ;
+           ] .
+
+_:b932CDE4Ex86420 sh:datatype xsd:string ;
+  a rdfs:Resource, rdfs:Resource .
+
+_:b932CDE4Ex86418 sh:datatype rdf:langString ;
+  a rdfs:Resource, rdfs:Resource .
+
