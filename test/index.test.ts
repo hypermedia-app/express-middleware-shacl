@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import express, { Express } from 'express'
 import request from 'supertest'
-import { foaf, rdf, rdfs, schema, sh } from '@tpluscode/rdf-ns-builders'
+import { foaf, rdf, rdfs, schema, sh, skos } from '@tpluscode/rdf-ns-builders'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { turtle } from '@tpluscode/rdf-string'
@@ -11,6 +11,7 @@ import sinon from 'sinon'
 import { fromPointer as nodeShape } from '@rdfine/shacl/lib/NodeShape'
 import { fromPointer as propertyShape } from '@rdfine/shacl/lib/PropertyShape'
 import { shaclMiddleware } from '..'
+import { testShape } from './test-shapes'
 
 describe('express-middleware-shacl', () => {
   let app: Express
@@ -390,5 +391,28 @@ describe('express-middleware-shacl', () => {
       .expect({
         size: 2,
       })
+  })
+
+  it('does not SOE when validating', async () => {
+    // given
+    app.use(shaclMiddleware({
+      async loadShapes() {
+        return testShape('brand')
+      },
+    }))
+    app.use(async (req, res) => {
+      const resource = await req.resource()
+      res.send({ size: resource.dataset.size })
+    })
+
+    // when
+    const response = request(app)
+      .post('/brands')
+      .send(turtle`<> a <https://wikibus.lndo.site/api/Brand> ; ${skos.notation} "gm" ; ${skos.prefLabel} "GM" .`.toString())
+      .set('host', 'wikibug.org')
+      .set('content-type', 'text/turtle')
+
+    // then
+    await response.expect(200)
   })
 })
