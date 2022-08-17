@@ -413,6 +413,6 @@ describe('express-middleware-shacl', () => {
       .set('content-type', 'text/turtle')
 
     // then
-    await response.expect(200)
+    await response.expect(400)
   })
 })
