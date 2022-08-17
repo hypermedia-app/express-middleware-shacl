@@ -1,5 +1,12 @@
 # express-middleware-shacl
 
+## 1.3.3
+
+### Patch Changes
+
+- adbddaa: Updated rdf-validate-shacl to 0.4.4
+- adbddaa: A Stack Overflow exception could be thrown when validating certain complex shapes
+
 ## 1.3.2
 
 ### Patch Changes
