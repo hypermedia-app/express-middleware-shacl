@@ -2,16 +2,16 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import express, { Express } from 'express'
 import request from 'supertest'
-import { foaf, rdf, rdfs, schema, sh, skos } from '@tpluscode/rdf-ns-builders'
-import clownface from 'clownface'
-import $rdf from 'rdf-ext'
 import { turtle } from '@tpluscode/rdf-string'
 import httpStatus from 'http-status'
 import sinon from 'sinon'
-import { fromPointer as nodeShape } from '@rdfine/shacl/lib/NodeShape'
-import { fromPointer as propertyShape } from '@rdfine/shacl/lib/PropertyShape'
-import { shaclMiddleware } from '..'
-import { testShape } from './test-shapes'
+import { createEnv } from '@rdfine/env'
+import { ShFactory } from '@rdfine/shacl/Factory'
+import { shaclMiddleware } from '../index.js'
+import { testShape } from './test-shapes/index.js'
+
+const $rdf = createEnv(ShFactory)
+const { foaf, rdf, rdfs, schema, sh, skos } = $rdf.ns
 
 describe('express-middleware-shacl', () => {
   let app: Express
@@ -91,8 +91,8 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const pointer = clownface({ dataset: $rdf.dataset() }).blankNode()
-        nodeShape(pointer, {
+        const pointer = $rdf.clownface({ dataset: $rdf.dataset() }).blankNode()
+        $rdf.rdfine.sh.NodeShape(pointer, {
           targetClass: [schema.Article],
         })
 
@@ -118,10 +118,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.blankNode(), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.blankNode(), {
           targetClass: [schema.Person],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -150,10 +150,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.blankNode(), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.blankNode(), {
           targetClass: [schema.Person],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -179,10 +179,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.namedNode(schema.Person), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.namedNode(schema.Person), {
           types: [rdfs.Class, sh.NodeShape],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -208,10 +208,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.namedNode(schema.Person), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.namedNode(schema.Person), {
           types: [sh.NodeShape],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -237,10 +237,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.blankNode(), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.blankNode(), {
           targetNode: [$rdf.namedNode('http://example.com/foo/bar/baz')],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -266,10 +266,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.blankNode(), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.blankNode(), {
           targetSubjectsOf: schema.name,
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.name,
             minCount: 1,
           }),
@@ -295,10 +295,10 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        const graph = clownface({ dataset: $rdf.dataset() })
-        nodeShape(graph.blankNode(), {
+        const graph = $rdf.clownface({ dataset: $rdf.dataset() })
+        $rdf.rdfine.sh.NodeShape(graph.blankNode(), {
           targetClass: [schema.Person],
-          property: propertyShape(graph.blankNode(), {
+          property: $rdf.rdfine.sh.PropertyShape(graph.blankNode(), {
             path: schema.spouse,
             class: schema.Person,
           }),
@@ -327,7 +327,7 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        return clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
+        return $rdf.clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
           .addOut(rdfs.subClassOf, foaf.Agent)
           .addOut(rdf.type, [rdfs.Class, sh.NodeShape])
           .node(foaf.Agent)
@@ -362,7 +362,7 @@ describe('express-middleware-shacl', () => {
     // given
     app.use(shaclMiddleware({
       async loadShapes() {
-        return clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
+        return $rdf.clownface({ dataset: $rdf.dataset() }).node(foaf.Person)
           .addOut(rdf.type, [rdfs.Class, sh.NodeShape])
           .addOut(sh.property, property => {
             property
