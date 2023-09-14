@@ -1,22 +1,19 @@
 import { DatasetCore, NamedNode, Quad, Term } from 'rdf-js'
 import express, { Request, Response, Router } from 'express'
 import asyncMiddleware from 'middleware-async'
-import $rdf from 'rdf-ext'
-import DatasetExt from 'rdf-ext/lib/Dataset'
+import { createEnv } from '@rdfine/env'
 import SHACLValidator from 'rdf-validate-shacl'
-import clownface, { AnyContext, AnyPointer, GraphPointer } from 'clownface'
+import type { AnyPointer, GraphPointer } from 'clownface'
 import { ProblemDocument } from 'http-problem-details'
-import { hydra, rdf, rdfs, sh } from '@tpluscode/rdf-ns-builders'
 import { attach } from 'express-rdf-request'
-import * as absoluteUrl from 'absolute-url'
-import { fromPointer } from '@rdfine/shacl/lib/ValidationResult'
+import absoluteUrl from 'absolute-url'
 import setLink from 'set-link'
-import TermSet from '@rdfjs/term-set'
-import RdfResource from '@tpluscode/rdfine/RdfResource'
-import { ShapeBundle } from '@rdfine/shacl/bundles'
 import { findNodes } from 'clownface-shacl-path'
+import { ShFactory } from '@rdfine/shacl/Factory'
+import addAll from 'rdf-dataset-ext/addAll.js'
 
-RdfResource.factory.addMixin(...ShapeBundle)
+const $rdf = createEnv(ShFactory)
+const { hydra, rdf, rdfs, sh } = $rdf.ns
 
 interface ShaclMiddlewareOptions {
   loadTypes?(resources: NamedNode[], req: Request, res: Response): Promise<DatasetCore>
@@ -28,7 +25,7 @@ declare module 'express-serve-static-core' {
   interface Request {
     shacl: {
       dataGraph: GraphPointer
-      shapesGraph: AnyPointer<AnyContext, DatasetExt>
+      shapesGraph: AnyPointer
     }
   }
 }
@@ -38,7 +35,7 @@ function isNamedNode(term: Term): term is NamedNode {
 }
 
 function targetsFound({ shacl: { shapesGraph, dataGraph } }: express.Request): boolean {
-  const resourceTypes = new TermSet(dataGraph.any().has(rdf.type).out(rdf.type).terms)
+  const resourceTypes = $rdf.termSet(dataGraph.any().has(rdf.type).out(rdf.type).terms)
 
   const classTargets = () => shapesGraph.has(sh.targetClass, dataGraph.any().has(rdf.type).out(rdf.type)).terms
   const implicitClassTargets = () => {
@@ -83,8 +80,8 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
     }
 
     req.shacl = {
-      dataGraph: clownface({ dataset: dataGraphDataset, term }),
-      shapesGraph: clownface({ dataset: $rdf.dataset() }),
+      dataGraph: $rdf.clownface({ dataset: dataGraphDataset, term }),
+      shapesGraph: $rdf.clownface({ dataset: $rdf.dataset() }),
     }
     next()
   }))
@@ -92,7 +89,7 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
   router.use(asyncMiddleware(async (req, res, next) => {
     const shapes = await loadShapes(req, res)
 
-    req.shacl.shapesGraph.dataset.addAll([...shapes])
+    addAll(req.shacl.shapesGraph.dataset, [...shapes])
 
     next()
   }))
@@ -137,17 +134,20 @@ export const shaclMiddleware = ({ loadShapes, loadTypes, errorContext = 'https:/
       }))
     }
 
-    const dataset = $rdf.dataset(
-      [...req.shacl.shapesGraph.dataset.map(toGraph('urn:graph:shapes')),
-        ...[...req.shacl.dataGraph.dataset].map(toGraph('urn:graph:data'))],
-    )
+    const dataset = $rdf.dataset([
+      ...[...req.shacl.shapesGraph.dataset].map(toGraph('urn:graph:shapes')),
+      ...[...req.shacl.dataGraph.dataset].map(toGraph('urn:graph:data')),
+    ])
 
     const validationReport = new SHACLValidator(dataset).validate(dataset)
     if (validationReport.conforms) {
       return next()
     }
 
-    const results = validationReport.results.map((r: any) => fromPointer(clownface(r)).toJSON())
+    const results = validationReport.results.map(({ term, dataset }) => $rdf.rdfine.sh.ValidationReport($rdf.clownface({
+      term,
+      dataset,
+    })).toJSON())
     const response = new ProblemDocument({
       status: 400,
       title: 'Request validation error',
