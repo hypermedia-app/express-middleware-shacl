@@ -1,5 +1,11 @@
 # express-middleware-shacl
 
+## 2.0.0
+
+### Major Changes
+
+- c0f49f9: Package is now ESM
+
 ## 1.3.3
 
 ### Patch Changes
